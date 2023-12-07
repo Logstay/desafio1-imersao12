@@ -8,11 +8,6 @@ import (
 
 func main() {
 
-	if len(os.Args) < 3 {
-		fmt.Println("Please provide 3 input filenames. 1:")
-		return
-	}
-
 	transform := csv.NewCsvTransform()
 
 	inputFileName := os.Args[1]
@@ -30,8 +25,7 @@ func main() {
 		return
 	}
 
-	outputSecondFileName := os.Args[3]
-	err = transform.SortedByAge(people, outputSecondFileName)
+	err = transform.SortedByAge(people, outputFileName)
 	if err != nil {
 		fmt.Printf("Error sorting by age: %s\n", err)
 		return

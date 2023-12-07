@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"imersao16-ordenation/internal/dto"
 	"os"
+	"path/filepath"
 	"sort"
+	"strconv"
 )
 
 type CSVTransform struct {
@@ -15,7 +17,7 @@ func NewCsvTransform() CSVTransform {
 	return CSVTransform{}
 }
 
-func (c CSVTransform) Read(filename string) ([]dto.CsvFile, error) {
+func (c CSVTransform) Read(filename string) ([]dto.Person, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -28,25 +30,27 @@ func (c CSVTransform) Read(filename string) ([]dto.CsvFile, error) {
 		return nil, err
 	}
 
-	var people []dto.CsvFile
+	var people []dto.Person
 	for i, line := range lines {
-		var CsvFile dto.CsvFile
 		if i == 0 {
-			CsvFile.Header = line
+			continue
 		}
 
-		CsvFile = dto.CsvFile{
-			Line: line,
+		age, _ := strconv.Atoi(line[1])
+		score, _ := strconv.Atoi(line[2])
+		person := dto.Person{
+			Name:  line[0],
+			Age:   age,
+			Score: score,
 		}
-
-		people = append(people, CsvFile)
+		people = append(people, person)
 	}
 
 	fmt.Println(people)
 	return people, nil
 }
 
-func (c CSVTransform) Write(filename string, people []dto.CsvFile) error {
+func (c CSVTransform) Write(filename string, people []dto.Person) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -56,28 +60,28 @@ func (c CSVTransform) Write(filename string, people []dto.CsvFile) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
+	data := [][]string{
+		{"Nome", "Idade", "Pontuação"},
+	}
+
 	for _, record := range people {
+		data = append(data, []string{record.Name, strconv.Itoa(record.Age), strconv.Itoa(record.Score)})
+	}
 
-		if record.Header != nil {
-			err := writer.Write(record.Header)
-			if err != nil {
-				return err
-			}
-		}
-
-		err := writer.Write(record.Line)
-		if err != nil {
-			return err
-		}
-
+	err = writer.WriteAll(data)
+	if err != nil {
+		fmt.Println("Writing file error write...")
+		return err
 	}
 
 	return nil
 }
 
-func (c CSVTransform) SortedByAge(people []dto.CsvFile, outputFileName string) error {
+func (c CSVTransform) SortedByAge(people []dto.Person, outputFileName string) error {
 	sort.Sort(dto.ByAge(people))
 
+	ext := filepath.Ext(outputFileName)
+	outputFileName = outputFileName[:len(outputFileName)-len(ext)] + "_sorted_by_age" + ext
 	err := c.Write(outputFileName, people)
 	if err != nil {
 		fmt.Printf("Error writing output file sorted by age: %s\n", err)
@@ -87,9 +91,11 @@ func (c CSVTransform) SortedByAge(people []dto.CsvFile, outputFileName string) e
 	return nil
 }
 
-func (c CSVTransform) SortedByName(people []dto.CsvFile, outputFileName string) error {
+func (c CSVTransform) SortedByName(people []dto.Person, outputFileName string) error {
 	sort.Sort(dto.ByName(people))
 
+	ext := filepath.Ext(outputFileName)
+	outputFileName = outputFileName[:len(outputFileName)-len(ext)] + "_sorted_by_name" + ext
 	err := c.Write(outputFileName, people)
 	if err != nil {
 		fmt.Printf("Error writing output file sorted by name: %s\n", err)
