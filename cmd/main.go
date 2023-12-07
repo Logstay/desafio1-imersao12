@@ -2,42 +2,38 @@ package main
 
 import (
 	"fmt"
-	"imersao16-ordenation/internal/dto"
 	csv "imersao16-ordenation/internal/transform"
 	"os"
-	"sort"
 )
 
 func main() {
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: go run main.go input.csv output.csv")
+
+	if len(os.Args) < 3 {
+		fmt.Println("Please provide 3 input filenames. 1:")
 		return
 	}
 
 	transform := csv.NewCsvTransform()
 
-	inputFilename := os.Args[1]
-	outputFilename := os.Args[2]
+	inputFileName := os.Args[1]
 
-	people, err := transform.Read(inputFilename)
+	people, err := transform.Read(inputFileName)
 	if err != nil {
 		fmt.Printf("Error reading input file: %s\n", err)
 		return
 	}
 
-	// Sort by name
-	sort.Sort(dto.ByName(people))
-	err = transform.Write(outputFilename+"_sorted_by_name.csv", people)
+	outputFileName := os.Args[2]
+	err = transform.SortedByName(people, outputFileName)
 	if err != nil {
-		fmt.Printf("Error writing output file sorted by name: %s\n", err)
+		fmt.Printf("Error sorting by name: %s\n", err)
 		return
 	}
 
-	// Sort by age
-	sort.Sort(dto.ByAge(people))
-	err = transform.Write(outputFilename+"_sorted_by_age.csv", people)
+	outputSecondFileName := os.Args[3]
+	err = transform.SortedByAge(people, outputSecondFileName)
 	if err != nil {
-		fmt.Printf("Error writing output file sorted by age: %s\n", err)
+		fmt.Printf("Error sorting by age: %s\n", err)
 		return
 	}
 
