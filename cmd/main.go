@@ -19,15 +19,9 @@ func main() {
 	}
 
 	outputFileName := os.Args[2]
-	err = transform.SortedByName(people, outputFileName)
+	err = transform.Sort(people, outputFileName)
 	if err != nil {
-		fmt.Printf("Error sorting by name: %s\n", err)
-		return
-	}
-
-	err = transform.SortedByAge(people, outputFileName)
-	if err != nil {
-		fmt.Printf("Error sorting by age: %s\n", err)
+		fmt.Printf("Error sorting: %s\n", err)
 		return
 	}
 

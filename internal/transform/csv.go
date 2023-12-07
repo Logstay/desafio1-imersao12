@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"imersao16-ordenation/internal/dto"
 	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
 )
@@ -77,25 +76,9 @@ func (c CSVTransform) Write(filename string, people []dto.Person) error {
 	return nil
 }
 
-func (c CSVTransform) SortedByAge(people []dto.Person, outputFileName string) error {
-	sort.Sort(dto.ByAge(people))
-
-	ext := filepath.Ext(outputFileName)
-	outputFileName = outputFileName[:len(outputFileName)-len(ext)] + "_sorted_by_age" + ext
-	err := c.Write(outputFileName, people)
-	if err != nil {
-		fmt.Printf("Error writing output file sorted by age: %s\n", err)
-		return err
-	}
-
-	return nil
-}
-
-func (c CSVTransform) SortedByName(people []dto.Person, outputFileName string) error {
+func (c CSVTransform) Sort(people []dto.Person, outputFileName string) error {
 	sort.Sort(dto.ByName(people))
 
-	ext := filepath.Ext(outputFileName)
-	outputFileName = outputFileName[:len(outputFileName)-len(ext)] + "_sorted_by_name" + ext
 	err := c.Write(outputFileName, people)
 	if err != nil {
 		fmt.Printf("Error writing output file sorted by name: %s\n", err)
